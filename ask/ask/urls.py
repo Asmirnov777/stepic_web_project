@@ -18,17 +18,19 @@ from django.urls import path
 from qa.views import test
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
-    path('question/<int:question_id>/', test),
-    path('login/', test),
-    path('signup/', test),
-    path('ask/', test),
-    path('popular/', test),
-    path('new/', test)
-    #url(r'login/', test, name='login_func'),
-    #url(r'signup/', test, name='signup_func'),
-    #url(r'question/(?P<id>[^/]+)/', test, name='test'),
-    #url(r'ask/', test, name='ask_func'),
-    #url(r'popular/', test, name='popular_func'),
-    #url(r'new/', test, name='new_func')
+    ##path('admin/', admin.site.urls),
+    #path('', test),
+    #path('question/<int:question_id>/', test),
+    #path('login/', test),
+    #path('signup/', test),
+    #path('ask/', test),
+    #path('popular/', test),
+    #path('new/', test)
+    url(r'^$', test, name='index_func'),
+    url(r'^login/$', test, name='login_func'),
+    url(r'^signup/$', test, name='signup_func'),
+    url(r'^question/(?P<id>[^/]+)/$', test, name='test'),
+    url(r'^ask/$', test, name='ask_func'),
+    url(r'^popular/$', test, name='popular_func'),
+    url(r'^new/$', test, name='new_func')
 ]
