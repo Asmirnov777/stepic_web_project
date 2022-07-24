@@ -15,22 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from qa.views import test
+from qa.views import test, question_view, popular_view, new_view
+#import qa.views
 
 urlpatterns = [
-    ##path('admin/', admin.site.urls),
-    path('', test),
-    path('question/<int:question_id>/', test),
+    #path('admin/', admin.site.urls),
+    #path('', test),
+    path('', new_view, name='new-view'),
+    path('popular/', popular_view, name='popular-view'),
+    path('question/<int:id>/', question_view, name='question-view'),
     path('login/', test),
     path('signup/', test),
-    path('ask/', test),
-    path('popular/', test),
-    path('new/', test)
-    #url(r'^$', test, name='index_func'),
-    #url(r'^login/$', test, name='login_func'),
-    #url(r'^signup/$', test, name='signup_func'),
-    #url(r'^question/(?P<id>[^/]+)/$', test, name='test'),
-    #url(r'^ask/$', test, name='ask_func'),
-    #url(r'^popular/$', test, name='popular_func'),
-    #url(r'^new/$', test, name='new_func')
+    path('ask/', test)
+    #path('new/', new_view, name='new-view')
+
+    #url(r'login/', test, name='login_func'),
+    #url(r'signup/', test, name='signup_func'),
+    #url(r'question/(?P<id>[^/]+)/', question_view, name='question-view'),
+    #url(r'ask/', test, name='ask_func'),
+    #url(r'popular/', popular_view, name='popular-view'),
+    #url(r'', new_view, name='new-view')
 ]
