@@ -3,7 +3,7 @@ from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator, EmptyPage
-from models import Question, Answer, QuestionManager
+from qa.models import Question, Answer, QuestionManager
 #import models
 
 
