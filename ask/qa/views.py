@@ -3,7 +3,7 @@ from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator, EmptyPage
-from qa.models import Question, Answer, QuestionManager
+from qa.models import Question, Answer
 #import models
 
 
@@ -32,8 +32,13 @@ def question_view(request, id):
 #    except Question.DoesNotExist:
 #        raise Http404
     question = get_object_or_404(Question, id=id)
+    try:
+        answers = Answer.objects.filter(question_id=question.id)
+    except Answer.DoesNotExist:
+        answers = None
     return render(request, 'question_details.html', {
             'question': question,
+            'answers': answers
     })
 
 
@@ -46,6 +51,7 @@ def popular_view(request):
             'questions': page.object_list,
             'paginator': paginator,
             'page': page,
+            'page_numbers_list': range(1, paginator.num_pages + 1),
             'baseurl': '/popular/?page=',  # TODO: сделать через reverse
     })
 
@@ -59,5 +65,6 @@ def new_view(request):
             'questions': page.object_list,
             'paginator': paginator,
             'page': page,
+            'page_numbers_list': range(1, paginator.num_pages + 1),
             'baseurl': '/?page=',  # TODO: сделать через reverse
     })
