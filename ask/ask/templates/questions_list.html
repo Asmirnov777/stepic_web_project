@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+<body>
+<!-- Questions -->
+{% for q in questions %}
+    <a href= "/question/{{q.id}}/">{{ q.title|truncatechars:80 }}</a>
+    <!-- TODO: reverse! -->
+    <p></p>
+{% endfor %}
+<!-- Pagination -->
+<nav><ul class="pagination">
+{% for p in page_numbers_list %}
+    {% if p == page.number %}
+        <li class="active">
+    {% else %}
+        <li>
+    {% endif %}
+    <a href="{{ baseurl }}{{ p }}">{{p}}</a>
+    </li>
+{% endfor %}
+</ul></nav>
+</body>
+</html>

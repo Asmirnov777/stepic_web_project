@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Question</title>
+</head>
+<body>
+<h1>{{ question.title|truncatechars:80 }}</h1>
+<!-- <p>Author: {{ question.author }}</p>
+<p>Date: {{ question.added_at }}</p> -->
+<p>{{ question.text }}</p>
+<!-- <h2>Answers:</h2> -->
+{% for answer in answers %}
+    {% include "answer.html" %}
+{% endfor %}
+</body>
+</html>
