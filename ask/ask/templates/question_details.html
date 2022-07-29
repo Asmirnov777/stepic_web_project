@@ -3,15 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Question</title>
+        <script>
+            {% if messages %}
+                {% for message in messages %}
+                    alert(message);
+                {% endfor %}
+            {% endif %}
+        </script>
 </head>
 <body>
 <h1>{{ question.title|truncatechars:80 }}</h1>
 <!-- <p>Author: {{ question.author }}</p>
 <p>Date: {{ question.added_at }}</p> -->
 <p>{{ question.text }}</p>
-<!-- <h2>Answers:</h2> -->
+<h2>Answers:</h2>
 {% for answer in answers %}
-    {% include "answer.html" %}
+    <p>{{ answer.text }}</p>
 {% endfor %}
+<h2>Add new answer:</h2>
+<form method="POST" action="/question/{{question.id}}/">
+    {% if form.errors %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
 </body>
 </html>
