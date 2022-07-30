@@ -1,4 +1,5 @@
-from secrets import choice
+#from secrets import choice
+import random
 import string
 import hashlib
 from datetime import datetime, timedelta
@@ -9,7 +10,7 @@ from qa.models import Session
 def generate_long_random_key():
     length = 255  # TODO: дублируется в models.py
     characters = string.ascii_letters + string.digits + string.punctuation
-    return ''.join((choice(characters) for i in range(length)))
+    return ''.join(random.choice(characters) for _ in range(length))
 
 
 def salt_and_hash(password):
