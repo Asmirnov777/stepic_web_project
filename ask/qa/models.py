@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+#import django.contrib.sessions
 
 class QuestionManager(models.Manager):
     def new(self):        
@@ -33,3 +33,9 @@ class Answer(models.Model):
     added_at = models.DateField(auto_now_add=True, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+
+
+class Session(models.Model):
+    key = models.CharField(unique=True, max_length=255)
+    user = models.ForeignKey(User, blank=True, on_delete=models.DO_NOTHING)
+    expires = models.DateTimeField()

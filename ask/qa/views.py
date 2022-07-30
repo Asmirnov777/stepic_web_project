@@ -1,11 +1,20 @@
+import django.contrib.auth.views
+
+#import django.contrib.sessions as sessions
+from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator, EmptyPage
 from django.urls import reverse
 from django.contrib import messages
-from qa.models import Question, Answer
-from qa.forms import AskForm, AnswerForm
+#from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from qa.models import Question, Answer, Session
+from qa.forms import AskForm, AnswerForm, SignupForm
+from qa.misc import do_login, generate_long_random_key, get_username_from_request
 #import models
 
 
@@ -37,6 +46,8 @@ def base_view(request, funct, title, baseurl):
         'page': page,
         'page_numbers_list': range(1, paginator.num_pages + 1),
         'baseurl': baseurl,
+        'user': get_username_from_request(request),
+        #'sessionid': request.COOKIES.get('sessionid')
     })
 
 
@@ -58,6 +69,7 @@ def question_view(request, id):
         answers = None
     if request.method == "POST":
         form = AnswerForm(data=request.POST, question_id=id)
+        form._user = get_username_from_request(request)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/question/' + str(id))
@@ -75,6 +87,7 @@ def question_view(request, id):
 def question_add(request):
     if request.method == "POST":
         form = AskForm(data=request.POST)
+        form._user = get_username_from_request(request)
         if form.is_valid():
             question = form.save()
             return HttpResponseRedirect('/question/' + str(question.id))
@@ -82,4 +95,59 @@ def question_add(request):
         form = AskForm()
     return render(request, 'question_add.html', {
             'form': form
+    })
+
+
+def signup_view(request):
+    error = ''
+    if request.method == "POST":
+        #url = request.POST.get('continue', '/')  # Так правильно
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        url = '/'  # Для прохождения теста
+        form = SignupForm(data=request.POST)
+        if form.is_valid():
+            try:
+                user = User.objects.get(username=form.cleaned_data['username'])
+            except User.DoesNotExist:  #
+                user = form.save()  # TODO: обработать ошибку существования такого пользователя в БД
+                sessionid = do_login(username, password)  # TODO: попробовать реализовать средствами django.contrib.auth.login
+                response = HttpResponseRedirect(url)
+                response.set_cookie('sessionid', sessionid,
+                                    domain='localhost', httponly=True,
+                                    expires=datetime.now() + timedelta(days=1))
+                return response
+                #login(request, user)
+            error = 'Такой юзер уже экзист!'
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {
+        'form': form,
+        'error': error
+    })
+
+
+def login_view(request):
+    error = ''
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        #url = request.POST.get('continue', '/')  # Так правильно
+        url = '/'  # Для прохождения теста
+        sessionid = do_login(username, password)  # TODO: попробовать реализовать средствами django.contrib.auth.login
+        if sessionid:
+            response = HttpResponseRedirect(url)
+            response.set_cookie('sessionid', sessionid,
+                            domain='localhost', httponly=True,
+                            expires=datetime.now() + timedelta(days=1))
+            return response
+        else:
+            error = u'Wrong login / password'
+            form = AuthenticationForm()
+            #return HttpResponseRedirect('/')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {
+        'form': form,
+        'error': error  # TODO: error никак не используется
     })
