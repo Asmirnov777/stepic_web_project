@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from qa.views import test, question_view, popular_view, new_view, question_add
+from qa.views import test, question_view, popular_view, new_view, question_add, login_view, signup_view
 #import qa.views
 
 urlpatterns = [
@@ -24,8 +24,8 @@ urlpatterns = [
     path('', new_view, name='new-view'),
     path('popular/', popular_view, name='popular-view'),
     path('question/<int:id>/', question_view, name='question-view'),
-    path('login/', test),
-    path('signup/', test),
+    path('login/', login_view, name='login-view'),
+    path('signup/', signup_view, name='signup_view'),
     path('ask/', question_add, name='question-add')
     #path('new/', new_view, name='new-view')
 
