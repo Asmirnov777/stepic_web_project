@@ -4,6 +4,8 @@
     <title>{{title}}</title>
 </head>
 <body>
+<h2> Вы зашли как : {{user}}</h2>
+<!-- <h2> Sessionid: {{sessionid}}</h2> -->
 <!-- Questions -->
 {% for q in questions %}
     <a href= "/question/{{q.id}}/">{{ q.title|truncatechars:80 }}</a>
