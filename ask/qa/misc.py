@@ -17,7 +17,7 @@ def generate_long_random_key():
 def salt_and_hash(password):
     salt = u'&^tcvhjUYcYHgfc(*bjkhf8123yukfg^*DFj9783'
     salt_pass = password + salt
-    return hashlib.sha256(salt_pass.encode('UTF-8'), usedforsecurity=True).hexdigest()
+    return hashlib.sha256(salt_pass.encode('UTF-8')).hexdigest()
     #return password
 
 
