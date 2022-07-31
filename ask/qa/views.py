@@ -8,13 +8,13 @@ from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator, EmptyPage
 from django.urls import reverse
 from django.contrib import messages
-#from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from qa.models import Question, Answer, Session
+from qa.models import Question, Answer
 from qa.forms import AskForm, AnswerForm, SignupForm
-from qa.misc import do_login, generate_long_random_key, get_username_from_request
+from qa.misc import generate_long_random_key, get_username_from_request, salt_and_hash
 #import models
 
 
@@ -111,7 +111,7 @@ def signup_view(request):
                 user = User.objects.get(username=form.cleaned_data['username'])
             except User.DoesNotExist:  #
                 user = form.save()  # TODO: обработать ошибку существования такого пользователя в БД
-                sessionid = do_login(username, password)  # TODO: попробовать реализовать средствами django.contrib.auth.login
+                sessionid = login(request, user)
                 response = HttpResponseRedirect(url)
                 response.set_cookie('sessionid', sessionid,
                                     domain='localhost', httponly=True,
@@ -134,12 +134,18 @@ def login_view(request):
         password = request.POST.get('password')
         #url = request.POST.get('continue', '/')  # Так правильно
         url = '/'  # Для прохождения теста
-        sessionid = do_login(username, password)  # TODO: попробовать реализовать средствами django.contrib.auth.login
-        if sessionid:
+        #user = authenticate(request=request, username=username, password=salt_and_hash(password))
+        user = User.objects.get(username=username)
+        if user is not None:
+            if not user.password == salt_and_hash(password):
+                user = None
+        if user is not None:
+            sessionid = login(request, user)
+            #if sessionid:
             response = HttpResponseRedirect(url)
             response.set_cookie('sessionid', sessionid,
-                            domain='localhost', httponly=True,
-                            expires=datetime.now() + timedelta(days=1))
+                    domain='localhost', httponly=True,
+                    expires=datetime.now() + timedelta(days=1))
             return response
         else:
             error = u'Wrong login / password'
@@ -149,5 +155,5 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {
         'form': form,
-        'error': error  # TODO: error никак не используется
+        'error': error
     })

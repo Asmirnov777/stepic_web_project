@@ -4,11 +4,12 @@ import string
 import hashlib
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
-from qa.models import Session
+from django.contrib.sessions.models import Session
+
 
 
 def generate_long_random_key():
-    length = 255  # TODO: дублируется в models.py
+    length = 40  # TODO: дублируется в models.py
     characters = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choice(characters) for _ in range(length))
 
@@ -29,18 +30,19 @@ def do_login(username, password):
     if user.password != hashed_pass:
         return None
     session = Session()
-    session.key = generate_long_random_key()
+    session.session_key = generate_long_random_key()
     session.user = user
-    session.expires = datetime.now() + timedelta(days=1)
+    session.expire_date = datetime.now() + timedelta(days=1)
     session.save()
     return session.key
 
 
 def get_username_from_request(request):
     try:
-        session = Session.objects.get(key=request.COOKIES.get('sessionid'))
+        session = Session.objects.get(session_key=request.COOKIES.get('sessionid'))
     except Session.DoesNotExist:
         return None
-    user = User.objects.get(id=session.user_id)
+    user_id = session.get_decoded().get('_auth_user_id')
+    user = User.objects.get(id=user_id)
     return user.username
     #return request.user
